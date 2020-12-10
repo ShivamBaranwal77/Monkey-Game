@@ -29,6 +29,8 @@ function preload() {
 
 function setup() {
 
+  createCanvas(600,400)
+  
   //creating monkey
   monkey = createSprite(80, 315, 20, 20);
   monkey.addAnimation("moving", monkey_running);
@@ -36,7 +38,7 @@ function setup() {
   monkey.debug = false;
 
   //creating ground
-  ground = createSprite(400, 350, 900, 10);
+  ground = createSprite(400, 350, 1800, 10);
   ground.x = ground.width / 2;
 
   //create banana & obstacle Group
@@ -48,29 +50,11 @@ function setup() {
 function draw() {
 
   background("white");
-
-  banana();
-  Obstacles();
-
-  stroke("white");
-  textSize(20);
-  fill("white");
-  text("score: " + score, 500, 50);
-
-  //adding survival time
+  
   stroke("black");
   textSize(20);
   fill("black");
-  survivalTime = Math.ceil(frameCount / frameRate())
-  text("survivalTime: " + survivalTime, 100, 50);
-
-
-//making unlimited scrolling ground & adding velocity
-  ground.velocityX = -4;
-  if (ground.x < 0) {
-    ground.x = ground.width / 2;
-  }
-
+  text("score: " + score, 500, 50);
 
   //ending game
   if (obstacleGroup.isTouching(monkey)) {
@@ -83,7 +67,6 @@ function draw() {
     monkey.velocityY = -12;
   }
 
-
 //making monkey collide with ground & adding gravity
   monkey.velocityY = monkey.velocityY + 0.8;
   monkey.collide(ground);
@@ -91,6 +74,22 @@ function draw() {
   
   if(gameState === PLAY){
   
+  //destroying bananas
+  if(bananaGroup.isTouching(monkey)){
+    score=score+1
+    bananaGroup.destroyEach();
+  }
+
+  survivalTime = Math.ceil(frameCount / frameRate())
+
+
+//making unlimited scrolling ground & adding velocity
+  ground.velocityX = -4;
+  if (ground.x < 0) {
+    ground.x = ground.width / 2;
+  }
+    
+    
   //Call banana and Obstacles functions
   banana();
   Obstacles();
@@ -107,13 +106,17 @@ function draw() {
      obstacleGroup.setVelocityXEach(0);
      bananaGroup.setVelocityXEach(0);
       
-      ground.velocityX = 0;
-      monkey.velocityY = 0;
+     ground.velocityX = 0;
+     monkey.velocityY = 0;
     
-    monkey.changeAnimation("mon",monkey_);
-    
-    
+    monkey.changeAnimation("monkeystopped",monkey_);
      }
+  
+  //adding survival time
+  stroke("black");
+  textSize(20);
+  fill("black");
+  text("survivalTime: " + survivalTime, 100, 50);
     
   drawSprites();
 
@@ -141,7 +144,9 @@ function Obstacles() {
     //assign scale and lifetime to the obstacle       
     obstacle.scale = 0.3;
     obstacle.lifetime = 300;
-
+    obstacle.debug=false;
+    obstacle.setCollider("circle",0,0,290);
+    
     //add each obstacle to the group
     obstacleGroup.add(obstacle);
   }
